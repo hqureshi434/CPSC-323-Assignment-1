@@ -58,7 +58,7 @@ public:
 			if (word.compare(keywords[i]) == 1) {
 				return keyWordID;
 			}
-			else if(word.compare(keywords[i]) == 0){
+			else /*if(word.compare(keywords[i]) == 0)*/{
 				return identifierID;
 			}
 		}
@@ -84,7 +84,7 @@ public:
 				 file >> lexArr[countWord].lex; /*Stores each word and character as a string from the file
 			 							  into the struct lexeme under the variable*/
 				 cout << "\n";
-				 currentWord = lexArr[countWord].lex;
+				 currentWord = lexArr[countWord].lex;//Gets the word from the struct array and sets it to a string
 
 				 fileWriter << currentWord << "\n";
 				 fileWriter << keyWordSearch(currentWord);
