@@ -1,0 +1,9 @@
+Token:          Lexeme:
+int
+          Keyword
+x
+          Keyword
+=
+          Keyword
+0;
+          Keyword

@@ -2,11 +2,16 @@
 //
 
 #include "pch.h"
+#include "Lexer.h"
 #include <iostream>
+
+using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n"; 
+    lexer lexicalAnalysis = lexer("Input.txt", "Output.txt");
+ 
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

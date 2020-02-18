@@ -6,10 +6,12 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
 
-enum FSMTransitions {
+enum FSMTransitions { //Enumeration for Finite State Machine States
 	Ignore = 0,
 	Integer,
 	Operator,
@@ -17,35 +19,16 @@ enum FSMTransitions {
 	Space
 };
 
-/*enum FSM_TRANSITIONS
-{
-    REJECT = 0,
-    INTEGER,
-    REAL,
-    OPERATOR,
-    STRING,
-    UNKNOWN,
-    SPACE
-};*/
-
-/*int stateTable[][7] = {{0, INTEGER,  REAL,  OPERATOR,  STRING, UNKNOWN,  SPACE},
-/* STATE 1  {INTEGER, INTEGER, REAL, REJECT, REJECT, REJECT, REJECT},
-/* STATE 2 { REAL,       REAL,  UNKNOWN, REJECT,   REJECT,  REJECT,  REJECT },
-/* STATE 3 { OPERATOR,  REJECT, REJECT,  REJECT,   STRING,  REJECT,  REJECT },
-/* STATE 4 { STRING,    STRING, REJECT,  STRING,   STRING,  REJECT,  REJECT },
-/* STATE 5 { UNKNOWN,  UNKNOWN, UNKNOWN, UNKNOWN,  UNKNOWN, UNKNOWN, REJECT },
-/* STATE 6 { SPACE,     REJECT, REJECT,  REJECT,   REJECT,  REJECT,  REJECT }};
-
 
 //Finite State Machine Table
 /*integer, real, operator,  string, unknown, space */
 int stateTable[][5] = { {0, Integer,  Operator,  String,  Space},
-/* STATE 1 */   {Integer,  Integer,  Ignore, Ignore, Ignore},
-/* STATE 2 */   {Operator, Ignore, Ignore, Ignore, Ignore},
-/* STATE 3 */   {String,  String, Ignore, Ignore, Ignore},
-/* STATE 4 */   {Space,  Ignore, Ignore, String, Ignore}};
+				    {Integer,  Integer,  Ignore, Ignore, Ignore},     //State 1
+				    {Operator, Ignore, Ignore, Ignore, Ignore},       //State 2
+				    {String,  String, Ignore, Ignore, Ignore},        //State 3
+				    {Space,  Ignore, Ignore, String, Ignore}};        //State 4
 
-char keywords[32][10] = { "auto","break","case","char","const","continue","default",
+string keywords[32] = { "auto","break","case","char","const","continue","default",
 					 "do","double","else","enum","extern","float","for","goto",
 					 "if","int","long","register","return","short","signed",
 					 "sizeof","static","struct","switch","typedef","union",
@@ -54,28 +37,60 @@ char keywords[32][10] = { "auto","break","case","char","const","continue","defau
 struct lexeme
 {
 	string lex; //String or char? Should be a string according to professor since we are taking in words from the text document
+	int lexNumber; //lexeme
+	string token;
 };
 
-class LexAnalysis {
+class lexer {
 private:
 	lexeme *lexArr = new lexeme[1000000]; //Create a type lexeme array to store data from the text file 
 	int countWord; //Acts as the index for the lexArr array
 
 public:
 	//Create helper functions to go inside lexer (one strategy that can be used)
-	//Implement Enumeration and Switch Statement here
 
+	string keyWordSearch(string word) { //Compares text from the text file to see if there any keywords
+		string keyWordID = "          Keyword\n";
+		string identifierID = "          Identifier\n";
+		string Unknown = "          Unknown\n";
 
-	 void lexer(string filename) {  
+		for (int i = 0; i < sizeof(keywords); i++) {
+			if (word.compare(keywords[i]) == 1) {
+				return keyWordID;
+			}
+			else if(word.compare(keywords[i]) == 0){
+				return identifierID;
+			}
+		}
+		return Unknown;
+	}
+
+	lexer() {}; //Default Contructor
+
+	lexer(string filename, string outputFile) {
+		 string currentWord;
 		 fstream file(filename, ios::in); //This will read in the file
+		 ofstream fileWriter;
+
+		 fileWriter.open(outputFile); //This will create a new file to write the output to
+		 fileWriter << "Token:          Lexeme:\n";
+
 		 if (!file.is_open()) {
 			 cout << "Cannot open file";
 		 }
 		 else {
 			 while (!file.eof()) {
 				 countWord++;
-				 file >> lexArr[countWord].lex; //Stores each word and character as a string from the file 
-			 }							  //into the struct lexeme under the variable
+				 file >> lexArr[countWord].lex; /*Stores each word and character as a string from the file
+			 							  into the struct lexeme under the variable*/
+				 cout << "\n";
+				 currentWord = lexArr[countWord].lex;
+
+				 fileWriter << currentWord << "\n";
+				 fileWriter << keyWordSearch(currentWord);
+			 }
 		 }
+		 fileWriter.close();
+		 file.close();
 	}
 };
