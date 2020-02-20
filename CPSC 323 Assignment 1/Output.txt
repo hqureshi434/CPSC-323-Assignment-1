@@ -1,9 +1,5 @@
 Token:          Lexeme:
-;0
-          Identifier
-=
-          Identifier
-x
-          Keyword
-int
-          Keyword
+int          Identifier
+x          Keyword
+=          Identifier
+0;          Identifier

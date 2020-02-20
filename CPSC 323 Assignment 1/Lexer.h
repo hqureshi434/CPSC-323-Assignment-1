@@ -7,32 +7,44 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <iterator>
+#include <cctype>
+#include <cstdlib>
 
 using namespace std;
 
-enum FSMTransitions { //Enumeration for Finite State Machine States
+/*enum FSMTransitions { //Enumeration for Finite State Machine States
 	Ignore = 0,
 	Integer,
 	Operator,
 	String,
+	Space
+};*/
+
+enum FSMTransitions {
+	Ignore = 0,
+	Integer,
+	Real,
+	Identifier,
 	Space
 };
 
 
 //Finite State Machine Table
 /*integer, real, operator,  string, unknown, space */
-int stateTable[][5] = { {0, Integer,  Operator,  String,  Space},
+/*int stateTable[][5] = { {0, Integer,  Operator,  String,  Space},
 				    {Integer,  Integer,  Ignore, Ignore, Ignore},     //State 1
 				    {Operator, Ignore, Ignore, Ignore, Ignore},       //State 2
 				    {String,  String, Ignore, Ignore, Ignore},        //State 3
-				    {Space,  Ignore, Ignore, String, Ignore}};        //State 4
+				    {Space,  Ignore, Ignore, String, Ignore}};        //State 4*/
 
-string keywords[32] = { "auto","break","case","char","const","continue","default",
-					 "do","double","else","enum","extern","float","for","goto",
-					 "if","int","long","register","return","short","signed",
-					 "sizeof","static","struct","switch","typedef","union",
-					 "unsigned","void","volatile","while" };
+int stateTable[][5] = { {0 , Integer, Real, Identifier, Space},
+				  {Integer, Integer, Real, Ignore, Ignore},
+				  {Real, Integer, Ignore, Ignore, Ignore}, 
+				  {Identifier, Identifier, Ignore, Ignore},
+				  {Space, Ignore, Ignore, Ignore}};
+
+string keywords[] = { "int", "float", "bool", "true", "false", "if", "else", "then", "endif", "while", 
+				  "whileend", "do", "doend", "for", "forend", "input", "output", "and", "or" , "not" };
 
 struct lexeme
 {
@@ -47,14 +59,48 @@ private:
 	int countWord; //Acts as the index for the lexArr array
 
 public:
-	//Create helper functions to go inside lexer (one strategy that can be used)
+
+	//This function determines the state of the character being read
+	int getCharState(char currentC) {
+		//whitespace
+		if (isspace(currentC)) { return Space; }
+
+		//Checks for integers
+		else if (isdigit(currentC)) { return Integer; }
+
+		//Checks for real numbers
+		else if (currentC == '.') { return Real; }
+
+		//Otherwise it is an identifier
+		else { return Identifier; }
+	}
+
+	string lexName(int lexeme) { //String function that uses a switch statement to return what a certain token is
+		switch (lexeme) {
+		case Integer:
+			return "Integer";
+			break;
+		case Real:
+			return "Real";
+			break;
+		case Identifier:
+			return "Identifier";
+			break;
+		case Space:
+			return "Space";
+			break;
+		default:
+			return "Error";
+			break;
+		}
+	}
 
 	string keyWordSearch(string word) { //Compares text from the text file to see if there any keywords
-		string keyWordID = "          Keyword\n";
-		string identifierID = "          Identifier\n";
-		string Unknown = "          Unknown\n";
+		string keyWordID = "		Keyword\n";
+		string identifierID = "		Identifier\n";
+		string Unknown = "		Unknown\n";
 
-		for (int i = 0; i < sizeof(keywords); i++) {
+		for (int i = 0; i < sizeof(keywords); ++i) {
 			if (word.compare(keywords[i]) == 1) {
 				return keyWordID;
 			}
@@ -68,9 +114,16 @@ public:
 	lexer() {}; //Default Contructor
 
 	lexer(string filename, string outputFile) {
+		//Variable
+		 char currentChar = ' ';
+		 int col = Ignore;
+		 int currentState = Ignore;
+		 int prevState = Ignore;
 		 string currentWord;
+
+		 //File objects
 		 fstream file(filename, ios::in); //This will read in the file
-		 ofstream fileWriter;
+		 ofstream fileWriter; //Created so we can write the output to a separate file
 
 		 fileWriter.open(outputFile); //This will create a new file to write the output to
 		 fileWriter << "Token:          Lexeme:\n";
@@ -86,7 +139,7 @@ public:
 				 cout << "\n";
 				 currentWord = lexArr[countWord].lex;//Gets the word from the struct array and sets it to a string
 
-				 fileWriter << currentWord << "\n";
+				 fileWriter << currentWord;
 				 fileWriter << keyWordSearch(currentWord);
 			 }
 		 }
