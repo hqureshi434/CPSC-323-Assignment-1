@@ -50,7 +50,7 @@ struct lexeme
 {
 	string lex; //String or char? Should be a string according to professor since we are taking in words from the text document
 	int lexNumber; //lexeme
-	string token;
+	string token; //This will hold text coming from the file
 };
 
 class lexer {
@@ -59,6 +59,9 @@ private:
 	int countWord; //Acts as the index for the lexArr array
 
 public:
+
+	//Notes: Group Keywords and Identifiers as strings in one loop then in a nested loop do a comparision with the strings to determine if they are 
+	//keywords with the array. If there are any strings left that are not keywords then they will be labeled as idenitifiers.
 
 	//This function determines the state of the character being read
 	int getCharState(char currentC) {
@@ -134,10 +137,10 @@ public:
 		 else {
 			 while (!file.eof()) {
 				 countWord++;
-				 file >> lexArr[countWord].lex; /*Stores each word and character as a string from the file
+				 file >> lexArr[countWord].token; /*Stores each word and character as a string from the file
 			 							  into the struct lexeme under the variable*/
 				 cout << "\n";
-				 currentWord = lexArr[countWord].lex;//Gets the word from the struct array and sets it to a string
+				 currentWord = lexArr[countWord].token;//Gets the word from the struct array and sets it to a string
 
 				 fileWriter << currentWord;
 				 fileWriter << keyWordSearch(currentWord);
