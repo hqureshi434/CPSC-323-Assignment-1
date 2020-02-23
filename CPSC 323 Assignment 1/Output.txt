@@ -1,5 +1,5 @@
-Token:          Lexeme:
-int          Identifier
-x          Keyword
-=          Identifier
-0;          Identifier
+Token:		Lexeme:
+inti			Identifier
+xx			Identifier
+==			Identifier
+0;0			Integer

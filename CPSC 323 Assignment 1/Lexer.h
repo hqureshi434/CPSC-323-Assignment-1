@@ -117,6 +117,73 @@ public:
 	lexer() {}; //Default Contructor
 
 	lexer(string filename, string outputFile) {
+		//Variables
+		lexeme tool;
+		int countWord = 0;
+		char currentChar = ' ';
+		int col = Ignore;
+		int currentState = Ignore;
+		int prevState = Ignore;
+		string currentWord = "";
+
+		//File objects
+		fstream file(filename, ios::in); //This will read in the file
+		ofstream fileWriter; //Created so we can write the output to a separate file
+
+		fileWriter.open(outputFile); //This will create a new file to write the output to
+		fileWriter << "Token:		Lexeme:\n";
+
+		if (!file.is_open()) {
+			cout << "Cannot open file";
+		}
+		else {
+			while (!file.eof()) {
+				
+				file >> lexArr[countWord].token; /*Stores each word and character as a string from the file
+										 into the struct lexeme under the variable*/
+				cout << "\n";
+				currentWord = lexArr[countWord].token;//Gets the word from the struct array and sets it to a string
+
+				for (int i = 0; i < currentWord.length();) {
+					currentChar = currentWord[i]; //Grab each character from the word that came from the array
+					col = getCharState(currentChar); //This will return the transition type for the current character
+
+					currentState = stateTable[currentState][col]; //Get the current state from the current word
+
+					if (currentState == Ignore) {
+						if (prevState != Space) { //Ignore whitespace
+							tool.token = currentWord;
+							tool.lexNumber = prevState;
+							tool.lex = lexName(tool.lexNumber);
+
+							fileWriter << tool.token << "			" << tool.lex << "\n"; //Write the results to the text file
+						}
+						currentWord = "";
+					}
+					else {
+						currentWord += currentChar;
+						++i;
+					}
+					prevState = currentState;
+				}
+				//This is to make sure that every word get read in
+				if (currentState != Space && currentWord != "") {
+					tool.token = currentWord;
+					tool.lexNumber = prevState;
+					tool.lex = lexName(tool.lexNumber);
+
+					fileWriter << tool.token << "			" << tool.lex << "\n";
+				}
+
+				countWord++;
+			}
+		}
+		fileWriter.close();
+		file.close();
+	}
+
+	/*
+	lexer(string filename, string outputFile) {
 		//Variable
 		 char currentChar = ' ';
 		 int col = Ignore;
@@ -139,7 +206,7 @@ public:
 				 countWord++;
 				 file >> lexArr[countWord].token; /*Stores each word and character as a string from the file
 			 							  into the struct lexeme under the variable*/
-				 cout << "\n";
+				/* cout << "\n";
 				 currentWord = lexArr[countWord].token;//Gets the word from the struct array and sets it to a string
 
 				 fileWriter << currentWord;
@@ -147,6 +214,6 @@ public:
 			 }
 		 }
 		 fileWriter.close();
-		 file.close();
-	}
+		 file.close();*/
+	//}
 };
